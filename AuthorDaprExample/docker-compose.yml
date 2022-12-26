@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  articles-api:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: src/Articles/Articles.RestApi/Dockerfile
+    ports:
+      - "8085:80"
+    environment:
+      - ConnectionStrings__Postgres=Host=db;Port=5432;Database=articles;Username=postgres;Password=postgres;sslmode=allow
+    networks:
+      - internal
+  articles-api-dapr:
+    image: "daprio/daprd:latest"
+    command: ["./daprd", "--app-id", "articles-api", "--app-port", "80" ]
+    depends_on:
+      - articles-api
+    network_mode: "service:articles-api"
+    
+  db:
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - "15432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    networks:
+      - internal
+networks:
+  internal:
+    driver: bridge
