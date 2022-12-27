@@ -2,14 +2,14 @@ namespace Users.Domain;
 
 public record Username
 {
-    private string value;
+    private readonly string value;
 
     public required string Value
     {
         get => value;
-        set
+        init
         {
-            ArgumentNullException.ThrowIfNullOrEmpty(value);
+            ArgumentException.ThrowIfNullOrEmpty(value);
             this.value = value.Length switch
             {
                 < 3 => throw new ArgumentException("Too short"),

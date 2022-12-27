@@ -26,6 +26,8 @@ internal class UsersConfig : IEntityTypeConfiguration<User>
         builder.Property(u => u.Username).HasConversion(
             username => username.Value,
             @string => new Username { Value = @string }
-        );
+        ).HasMaxLength(50);
+
+        builder.HasIndex(u => u.Username);
     }
 }

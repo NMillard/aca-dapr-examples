@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Dapr.AspNetCore" Version="1.9.0" />
         <PackageReference Include="Dapr.Extensions.Configuration" Version="1.9.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
@@ -27,6 +28,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Users.Domain\Users.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Persistence\Migrations" />
     </ItemGroup>
 
 </Project>

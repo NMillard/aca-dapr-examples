@@ -10,4 +10,12 @@ Build the articles API container using:
 
 ## Dapr
 Run application with dapr sidecar.  
+Articles API:  
 `dapr run -a articles-api -p 5102 -d ./.dapr/components -- dotnet run --project src/Articles/Articles.RestApi`
+
+Users API:  
+`dapr run -a users-api -p 5088 -p 7171 -d ./.dapr/components -- dotnet run --project src/Users/Users.Api`
+
+
+## Notes
+The applications have an appsetting `UseDapr`, and EF core is having some trouble with creating migrations if this setting is set to `true`. To create migrations the `UseDapr` must be `false`.

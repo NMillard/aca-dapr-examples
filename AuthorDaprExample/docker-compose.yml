@@ -9,24 +9,62 @@ services:
     ports:
       - "8085:80"
     environment:
-      - ConnectionStrings__Postgres=Host=db;Port=5432;Database=articles;Username=postgres;Password=postgres;sslmode=allow
+      - UseDapr=true
     networks:
       - internal
   articles-api-dapr:
     image: "daprio/daprd:latest"
-    command: ["./daprd", "--app-id", "articles-api", "--app-port", "80" ]
-    depends_on:
-      - articles-api
+    command: [
+      "./daprd",
+      "--app-id", "articles-api",
+      "--app-port", "80"
+    ]
+    volumes:
+      - "./.dapr/components:/components"
     network_mode: "service:articles-api"
     
+    
+  users-api:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: src/Users/Users.Api/Dockerfile
+    ports:
+      - "8084:80"
+    environment:
+      - UseDapr=true
+    networks:
+      - internal
+  users-api-dapr:
+    image: "daprio/daprd:latest"
+    command: [
+      "./daprd",
+      "--app-id", "users-api",
+      "--app-port", "80"
+    ]
+    volumes:
+      - "./.dapr/components:/components"
+    network_mode: "service:users-api"
+  
   db:
+    container_name: postgres-compose
     image: postgres:15-alpine
     restart: always
     ports:
-      - "15432:5432"
+      - "25432:5432"
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
+    networks:
+      - internal
+  
+  pubsub:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbit-compose
+    ports:
+      - "5673:5672"
+      - "15673:15672"
     networks:
       - internal
 networks:

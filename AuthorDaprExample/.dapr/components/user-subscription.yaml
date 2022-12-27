@@ -1,0 +1,10 @@
+﻿apiVersion: dapr.io/v1alpha
+kind: Subscription
+metadata:
+  name: newuser-subscription
+spec:
+  topic: userevents
+  route: /events/newuser
+  pubsubname: pubsub
+scopes:
+  - articles-api

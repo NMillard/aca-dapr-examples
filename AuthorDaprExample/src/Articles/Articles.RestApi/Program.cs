@@ -34,7 +34,10 @@ builder.Services.AddDbContext<AppDbContext>((provider, options) =>
     string? connectionString = builder.Configuration.GetConnectionString("Postgres");
 
     logger.LogInformation("Using connection string {ConnectionString}", connectionString);
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "articles");
+    });
 });
 
 WebApplication app = builder.Build();
