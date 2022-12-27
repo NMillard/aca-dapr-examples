@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 if (builder.Configuration.GetValue<bool>("UseDapr"))
 {
+    // Inquire dapr about the secret store "secrets" 
+    // and load the key/value ConnectionStrings:Postgres
+    // Note: the secrets are coming from the file "secrets.json" in .dapr/components
     builder.Configuration.AddDaprSecretStore(source =>
     {
         DaprClient daprClient = new DaprClientBuilder().Build();
@@ -30,10 +33,14 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<AppDbContext>((provider, options) =>
 {
-    var logger = provider.GetRequiredService<ILogger<Program>>();
     string? connectionString = builder.Configuration.GetConnectionString("Postgres");
-
+#if  DEBUG
+    // Don't log the connection string in production. Logging it here is useful when learning
+    // how dapr works and where it loads the connection string from.
+    var logger = provider.GetRequiredService<ILogger<Program>>();
     logger.LogInformation("Using connection string {ConnectionString}", connectionString);
+#endif
+    
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
         npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "articles");
@@ -56,6 +63,8 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
+// Don't do this in production.
+// Read the readme.md section on database migrations.
 using IServiceScope provider = app.Services.CreateScope();
 var context = provider.ServiceProvider.GetRequiredService<AppDbContext>();
 var logger = provider.ServiceProvider.GetRequiredService<ILogger<Program>>();

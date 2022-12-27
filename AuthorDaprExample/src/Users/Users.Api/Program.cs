@@ -50,6 +50,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Don't do this in production.
+// Read the readme.md section on database migrations.
 using IServiceScope provider = app.Services.CreateScope();
 var context = provider.ServiceProvider.GetRequiredService<AppDbContext>();
 var logger = provider.ServiceProvider.GetRequiredService<ILogger<Program>>();

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Articles.RestApi.Domain;
+﻿using Articles.RestApi.Domain;
 using Articles.RestApi.Persistence;
 using Dapr;
 using Microsoft.AspNetCore.Mvc;
@@ -25,14 +24,14 @@ public class EventsController : ControllerBase
         logger.LogInformation("Received new user event: {Body}", body.ToString());
         if (string.IsNullOrEmpty(body.ToString())) return Ok();
 
-        NewUserEvent? e2 = body.Data;
+        NewUserEvent? @event = body.Data;
 
-        if (e2 is null) return Ok();
+        if (@event is null) return Ok();
 
         var userInfo = new UserInfo
         {
-            UserId = e2.UserId,
-            Username = e2.Username,
+            UserId = @event.UserId,
+            Username = @event.Username,
         };
 
         await context.UserInfo.AddAsync(userInfo);
@@ -40,27 +39,14 @@ public class EventsController : ControllerBase
         {
             await context.SaveChangesAsync();
 
-            logger.LogInformation("Saved new user info (UserId: {UserId})", e2.UserId.ToString());
+            logger.LogInformation("Saved new user info (UserId: {UserId})", @event.UserId.ToString());
 
             return Ok();
         } catch (Exception exception)
         {
-            logger.LogError(exception, "Could not save user with Id {UserId}", e2.UserId.ToString());
+            logger.LogError(exception, "Could not save user with Id {UserId}", @event.UserId.ToString());
             return BadRequest();
         }
-    }
-}
-
-public class CloudEventWrapper<T>
-{
-    public string Data { get; set; }
-
-    public T? ConvertToType()
-    {
-        return JsonSerializer.Deserialize<T>(Data, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
     }
 }
 

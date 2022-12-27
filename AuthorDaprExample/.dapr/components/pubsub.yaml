@@ -1,4 +1,7 @@
-﻿apiVersion: dapr.io/v1alpha1
+﻿# From https://docs.dapr.io/reference/components-reference/supported-pubsub/setup-rabbitmq/
+# with few modifictions to metadata.name.
+
+apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
   name: pubsub
@@ -8,8 +11,6 @@ spec:
   metadata:
     - name: host
       value: "amqp://localhost:5672"
-    - name: consumerID
-      value: my-app
     - name: durable
       value: true
     - name: deletedWhenUnused
